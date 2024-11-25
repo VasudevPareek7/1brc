@@ -5,7 +5,7 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class CalculateAverage_vasudev_baseline {
+public class CalculateAverage_vasudev_memorymap {
     final public static String fileName = "./measurements.txt";
 
     // Helper method to print results in the desired format
@@ -29,24 +29,8 @@ public class CalculateAverage_vasudev_baseline {
     public static void main(String[] args) {
         long startTime = System.nanoTime();
 
-        // TreeMap to store statistics for each city in sorted order
         ConcurrentHashMap<String, CityStats> statsMap = new ConcurrentHashMap<>();
 
-        try {
-            Files.lines(Paths.get(fileName))
-                    .parallel()// Stream each line from the file
-                    .forEach(line -> {
-                        //System.out.println(Thread.currentThread().getName() + " processing: " + line);
-                        String[] arr = line.split(";");
-                        String city = arr[0];
-                        double temp = Double.parseDouble(arr[1]);
-                        statsMap.computeIfAbsent(city, k -> new CityStats()).update(temp);
-                    });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // Print the statistics for each city in the desired format
         printMap(statsMap);
 
         long endTime = System.nanoTime();
@@ -54,25 +38,24 @@ public class CalculateAverage_vasudev_baseline {
 
         System.out.println("Time taken: " + durationInSeconds + " seconds");
     }
-
-    static class CityStats {
-        double sum = 0.0;
-        int count = 0;
-        double max = Double.MIN_VALUE;
-        double min = Double.MAX_VALUE;
-
-        // Synchronized update method
-        synchronized void update(double temp) {
-            sum += temp;
-            count++;
-            max = Math.max(max, temp);
-            min = Math.min(min, temp);
-        }
-
-        double getMean() {
-            return sum / count;
-        }
-    }
 }
 
 // Class to hold statistics for each city
+ class CityStats {
+    double sum = 0.0;
+    int count = 0;
+    double max = Double.MIN_VALUE;
+    double min = Double.MAX_VALUE;
+
+    // Synchronized update method
+    synchronized void update(double temp) {
+        sum += temp;
+        count++;
+        max = Math.max(max, temp);
+        min = Math.min(min, temp);
+    }
+
+    double getMean() {
+        return sum / count;
+    }
+}

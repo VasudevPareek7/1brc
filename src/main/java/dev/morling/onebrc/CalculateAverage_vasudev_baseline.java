@@ -36,21 +36,8 @@ public class CalculateAverage_vasudev_baseline {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] arr = line.split(";");
-                if (arr.length != 2) {
-                    System.err.println("Skipping malformed line: " + line);
-                    continue;
-                }
-
                 String city = arr[0];
-                double temp;
-                try {
-                    temp = Double.parseDouble(arr[1]);
-                } catch (NumberFormatException e) {
-                    System.err.println("Skipping invalid temperature: " + arr[1]);
-                    continue;
-                }
-
-                // Update or initialize stats for the city
+                double temp = Double.parseDouble(arr[1]);
                 statsMap.computeIfAbsent(city, k -> new CityStats()).update(temp);
             }
         } catch (Exception e) {

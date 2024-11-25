@@ -1,9 +1,10 @@
 package dev.morling.onebrc;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CalculateAverage_vasudev_baseline {
     final public static String fileName = "./measurements.txt";
@@ -30,16 +31,17 @@ public class CalculateAverage_vasudev_baseline {
         long startTime = System.nanoTime();
 
         // TreeMap to store statistics for each city in sorted order
-        Map<String, CityStats> statsMap = new TreeMap<>();
+        ConcurrentHashMap<String, CityStats> statsMap = new ConcurrentHashMap<>();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] arr = line.split(";");
-                String city = arr[0];
-                double temp = Double.parseDouble(arr[1]);
-                statsMap.computeIfAbsent(city, k -> new CityStats()).update(temp);
-            }
+        try {
+            Files.lines(Paths.get(fileName))
+                    .parallel()// Stream each line from the file
+                    .forEach(line -> {
+                        String[] arr = line.split(";");
+                        String city = arr[0];
+                        double temp = Double.parseDouble(arr[1]);
+                        statsMap.computeIfAbsent(city, k -> new CityStats()).update(temp);
+                    });
         } catch (Exception e) {
             e.printStackTrace();
         }

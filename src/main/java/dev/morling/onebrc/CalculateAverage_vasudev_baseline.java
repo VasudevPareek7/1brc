@@ -8,17 +8,19 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CalculateAverage_vasudev_baseline {
     final public static String fileName = "./measurements.txt";
 
-    // Helper method to print results in the desired format
-    public static void printMap(Map<String, CityStats> statsMap) {
+    public static void printMap(ConcurrentHashMap<String, CityStats> statsMap) {
         StringBuilder output = new StringBuilder("{");
-        for (Map.Entry<String, CityStats> entry : statsMap.entrySet()) {
-            String city = entry.getKey();
-            CityStats stats = entry.getValue();
-            output.append(city)
-                    .append("=")
-                    .append(String.format("%.1f/%.1f/%.1f", stats.min, stats.getMean(), stats.max))
-                    .append(", ");
-        }
+        statsMap.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey()) // Sort entries by city name
+                .forEach(entry -> {
+                    String city = entry.getKey();
+                    CityStats stats = entry.getValue();
+                    output.append(city)
+                            .append("=")
+                            .append(String.format("%.1f/%.1f/%.1f", stats.min, stats.getMean(), stats.max))
+                            .append(", ");
+                });
         if (output.length() > 1) {
             output.setLength(output.length() - 2); // Remove trailing comma and space
         }

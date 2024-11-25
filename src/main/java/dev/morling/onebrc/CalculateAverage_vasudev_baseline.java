@@ -3,7 +3,6 @@ package dev.morling.onebrc;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CalculateAverage_vasudev_baseline {
@@ -37,6 +36,7 @@ public class CalculateAverage_vasudev_baseline {
             Files.lines(Paths.get(fileName))
                     .parallel()// Stream each line from the file
                     .forEach(line -> {
+                        //System.out.println(Thread.currentThread().getName() + " processing: " + line);
                         String[] arr = line.split(";");
                         String city = arr[0];
                         double temp = Double.parseDouble(arr[1]);
@@ -63,15 +63,14 @@ class CityStats {
     double max = Double.MIN_VALUE;
     double min = Double.MAX_VALUE;
 
-    // Update statistics with a new temperature
-    void update(double temp) {
+    // Synchronized update method
+    synchronized void update(double temp) {
         sum += temp;
         count++;
         max = Math.max(max, temp);
         min = Math.min(min, temp);
     }
 
-    // Calculate mean
     double getMean() {
         return sum / count;
     }
